@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test multiple remote</title>
+    <script src="js/tom-select.complete.js"></script>
+    <link rel="stylesheet" href="css/tom-select.bootstrap5.css"/>
+    <link rel="stylesheet" href="css/tom-select.css"/>
+</head>
+<body>
+Test multiple remote
+
+<div class="p-4">
+    <select id="select-repo" placeholder="Pick a repository..." multiple></select>
+</div>
+
+<script>
+    new TomSelect('#select-repo',{
+        plugins: ['remove_button', 'caret_position'],
+        valueField: 'url',
+        labelField: 'name',
+        searchField: 'name',
+        persist: false,
+        // fetch remote data
+        load: function(query, callback) {
+            var url = 'https://api.github.com/search/repositories?q=' + encodeURIComponent(query);
+            fetch(url)
+                .then(response => response.json())
+                .then(json => {
+                    callback(json.items);
+                }).catch(()=>{
+                callback();
+            });
+        },
+    });
+</script>
+
+</body>
+</html>
