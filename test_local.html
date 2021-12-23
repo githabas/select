@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test local</title>
+    <script src="js/tom-select.complete.js"></script>
+    <link rel="stylesheet" href="css/tom-select.bootstrap5.css"/>
+    <link rel="stylesheet" href="css/tom-select.css"/>
+</head>
+<body>
+
+<p>Test single</p>
+<div class="p-4">
+    <select id="select-state" name="state[]" placeholder="Select a state..." autocomplete="off">
+        <option value="">Select a state...</option>
+        <option value="AL">Alabama</option>
+        <option value="AK">Alaska</option>
+        <option value="AZ">Arizona</option>
+        <option value="AR">Arkansas</option>
+        <option value="CA" selected>California</option>
+        <option value="CO">Colorado</option>
+        <option value="CT">Connecticut</option>
+        <option value="VA">Virginia</option>
+        <option value="WA">Washington</option>
+        <option value="WV">West Virginia</option>
+        <option value="WI">Wisconsin</option>
+        <option value="WY">Wyoming</option>
+    </select>
+</div>
+
+<p>Test multiple</p>
+<div class="p-4">
+<select id="select-state-multiple" name="state[]" multiple placeholder="Select a state..." autocomplete="off">
+    <option value="">Select a state...</option>
+    <option value="AL">Alabama</option>
+    <option value="AK">Alaska</option>
+    <option value="AZ">Arizona</option>
+    <option value="AR">Arkansas</option>
+    <option value="CA" selected>California</option>
+    <option value="CO">Colorado</option>
+    <option value="CT">Connecticut</option>
+    <option value="VA">Virginia</option>
+    <option value="WA">Washington</option>
+    <option value="WV">West Virginia</option>
+    <option value="WI">Wisconsin</option>
+    <option value="WY">Wyoming</option>
+</select>
+</div>
+
+<script>
+    new TomSelect("#select-state",{
+        plugins: ['caret_position'],
+    });
+
+    new TomSelect("#select-state-multiple",{
+        plugins: ['remove_button', 'caret_position'],
+    });
+</script>
+
+</body>
+</html>
