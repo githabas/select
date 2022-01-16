@@ -6,6 +6,16 @@
     <script src="js/tom-select.complete.js"></script>
     <link rel="stylesheet" href="css/tom-select.bootstrap5.css"/>
     <link rel="stylesheet" href="css/tom-select.css"/>
+    <style>
+        #div1, #div2 {
+            float: left;
+            width: 100px;
+            height: 35px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid black;
+        }
+    </style>
 </head>
 <body>
 
@@ -53,7 +63,7 @@
     });
 
     new TomSelect("#select-state-multiple",{
-        plugins: ['remove_button', 'caret_position'],
+        plugins: ['remove_button', 'caret_position', 'drag_drop'],
     });
 </script>
 

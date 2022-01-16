@@ -1506,6 +1506,7 @@
 			this.options = {};
 			this.userOptions = {};
 			this.items = [];
+			this.dragDropEvents = false;
 			instance_i++;
 			let dir;
 			const input = getDom(input_arg);
@@ -1745,7 +1746,7 @@
 				// event target is the input it should not be modified.
 				// otherwise, text selection within the input won't work.
 				// Fixes bug #212 which is no covered by tests
-				if (target === control_input && self.isOpen) {
+				if ((target === control_input && self.isOpen) || target.draggable) {
 					evt.stopPropagation(); // clicking anywhere in the control should not blur the control_input (which would close the dropdown)
 				} else {
 					preventDefault(evt, true);
@@ -3810,7 +3811,8 @@
 		_render(templateName, data) {
 			let value = '', id, html;
 			const self = this;
-
+			const inputMode = self.settings.mode;
+			const pluginsLoaded = self.plugins.loaded;
 			if (templateName === 'option' || templateName === 'item') {
 				value = get_hash(data[self.settings.valueField]);
 			} // render markup
@@ -3857,6 +3859,11 @@
 					setAttr(html, {
 						'data-ts-item': ''
 					});
+					if (inputMode === 'multi' && pluginsLoaded['drag_drop'] !== 'undefined') {
+						setAttr(html, {
+							'draggable': true
+						});
+					}
 				} else {
 					addClasses(html, self.settings.optionClass);
 					setAttr(html, {
@@ -4087,43 +4094,51 @@
 	 *
 	 */
 	function drag_drop () {
-		const self = this;
-		// if (!$.fn.sortable) throw new Error('The "drag_drop" plugin requires jQuery UI "sortable".');
+		let self = this;
 		if (self.settings.mode !== 'multi') return;
-		const orig_lock = self.lock;
-		const orig_unlock = self.unlock;
-		self.hook('instead', 'lock', () => {
-			const sortable = $(self.control).data('sortable');
-			if (sortable) sortable.disable();
-			return orig_lock.call(self);
-		});
-		self.hook('instead', 'unlock', () => {
-			const sortable = $(self.control).data('sortable');
-			if (sortable) sortable.enable();
-			return orig_unlock.call(self);
-		});
+
+		const bindToDrag = () => {
+			if (self.dragDropEvents) {
+				return;
+			}
+			let draggedIndex
+			let droppedIndex
+			if (self.control) {
+				const parentDiv = self.control.parentNode
+				parentDiv.addEventListener('dragstart', function(e) {
+					const eventTarget = e.target
+					draggedIndex = Array.from(eventTarget.parentNode.children).indexOf(eventTarget)
+				})
+				parentDiv.addEventListener('dragover', function(e) {
+					e.preventDefault();
+				})
+				parentDiv.addEventListener('drop', function(e) {
+					e.preventDefault();
+					const eventTarget = e.target
+					droppedIndex = Array.from(eventTarget.parentNode.children).indexOf(eventTarget)
+					if (eventTarget.className === 'item') {
+						let arrayOfNewChildren = []
+						for (let i = 0; i < eventTarget.parentNode.children.length; i++) {
+							if (i === draggedIndex) {
+								continue
+							} else if (i === droppedIndex) {
+								arrayOfNewChildren.push(eventTarget.parentNode.children[draggedIndex])
+							}
+							arrayOfNewChildren.push(eventTarget.parentNode.children[i])
+						}
+						eventTarget.parentNode.replaceChildren(...arrayOfNewChildren)
+					}
+				})
+			}
+			this.dragDropEvents = true
+		}
+
+		self.on('change', (e) => {
+			bindToDrag()
+		})
+
 		self.on('initialize', () => {
-			const $control = $(self.control).sortable({
-				items: '[data-value]',
-				forcePlaceholderSize: true,
-				disabled: self.isLocked,
-				start: (e, ui) => {
-					ui.placeholder.css('width', ui.helper.css('width'));
-					$control.css({
-						overflow: 'visible'
-					});
-				},
-				stop: () => {
-					$control.css({
-						overflow: 'hidden'
-					});
-					var values = [];
-					$control.children('[data-value]').each(function () {
-						if (this.dataset.value) values.push(this.dataset.value);
-					});
-					self.setValue(values);
-				}
-			});
+			bindToDrag()
 		});
 	}
 
