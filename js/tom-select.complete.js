@@ -4080,8 +4080,7 @@
 	}
 
 	/**
-	 * Plugin: "drag_drop" (Tom Select)
-	 * Copyright (c) contributors
+	 * Plugin: "drag_drop" (https://github.com/githabas/select)
 	 *
 	 * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
 	 * file except in compliance with the License. You may obtain a copy of the License at:
@@ -4099,7 +4098,7 @@
 
 		const bindToDrag = () => {
 			if (self.dragDropEvents) {
-				return;
+				return
 			}
 			let draggedIndex
 			let droppedIndex
@@ -4110,23 +4109,39 @@
 					draggedIndex = Array.from(eventTarget.parentNode.children).indexOf(eventTarget)
 				})
 				parentDiv.addEventListener('dragover', function(e) {
-					e.preventDefault();
+					e.preventDefault()
 				})
 				parentDiv.addEventListener('drop', function(e) {
-					e.preventDefault();
+					e.preventDefault()
 					const eventTarget = e.target
 					droppedIndex = Array.from(eventTarget.parentNode.children).indexOf(eventTarget)
-					if (eventTarget.className === 'item') {
-						let arrayOfNewChildren = []
-						for (let i = 0; i < eventTarget.parentNode.children.length; i++) {
+					if (eventTarget.className === 'item' && draggedIndex !== droppedIndex) {
+						const selectedOptions = self.input.querySelectorAll('option:checked')
+						let newOptions = []
+						let newChildren = []
+						for (let i = 0; i < eventTarget.parentNode.children.length - 1; i++) {
 							if (i === draggedIndex) {
 								continue
 							} else if (i === droppedIndex) {
-								arrayOfNewChildren.push(eventTarget.parentNode.children[draggedIndex])
+								newChildren.push(eventTarget.parentNode.children[draggedIndex])
+								// newOptions.push(selectedOptions[draggedIndex].cloneNode(true))
+								newOptions.push({
+									value: selectedOptions[draggedIndex].value,
+									text: selectedOptions[draggedIndex].text
+								})
 							}
-							arrayOfNewChildren.push(eventTarget.parentNode.children[i])
+							newChildren.push(eventTarget.parentNode.children[i])
+							newOptions.push({
+								value: selectedOptions[i].value,
+								text: selectedOptions[i].text
+							})
 						}
-						eventTarget.parentNode.replaceChildren(...arrayOfNewChildren)
+						eventTarget.parentNode.replaceChildren(...newChildren)
+						//-- updating original select element
+						selectedOptions.forEach((option, i) => {
+							option.value = newOptions[i].value
+							option.text = newOptions[i].text
+						});
 					}
 				})
 			}
