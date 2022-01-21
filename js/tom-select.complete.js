@@ -4119,18 +4119,20 @@
 						const selectedOptions = self.input.querySelectorAll('option:checked')
 						let newOptions = []
 						let newChildren = []
-						for (let i = 0; i < eventTarget.parentNode.children.length - 1; i++) {
+						for (let i = 0; i < eventTarget.parentNode.children.length; i++) {
 							if (i === draggedIndex) {
 								continue
 							} else if (i === droppedIndex) {
 								newChildren.push(eventTarget.parentNode.children[draggedIndex])
-								// newOptions.push(selectedOptions[draggedIndex].cloneNode(true))
 								newOptions.push({
 									value: selectedOptions[draggedIndex].value,
 									text: selectedOptions[draggedIndex].text
 								})
 							}
 							newChildren.push(eventTarget.parentNode.children[i])
+							if (eventTarget.parentNode.children[i].nodeName === 'INPUT') {
+								continue
+							}
 							newOptions.push({
 								value: selectedOptions[i].value,
 								text: selectedOptions[i].text
